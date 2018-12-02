@@ -1,61 +1,23 @@
-import re
+#Jens lösning för dag 1. Lite mindre kod, lite snyggare, (men färre for-loopar :(( )
+#Set istället för list i lösning två, och mycket mindre kladd.
+#Så mycket lättare att använda ints som ints och inte som strings #genombrott #prohacker
 
-file_input = open("./inputsE/input01.txt", "rt")
-mainString = file_input.read()
-file_input.close()
+mainList =[]
+with open("./inputsE/input01.txt", "rt") as readFile:
+    for line in readFile:
+        mainList.append(int(line))
 
-listTest = mainString.split("\n")
-listTest = listTest[:-1]
+print("Final freq afer one run: " +str(sum(mainList)))
 
+freqFound = False
 currentFreq = 0
-beenHereBefore = []
-for i in range(0,len(listTest)):
-    currChange = listTest[i]
-    if(currChange.startswith("+")):
-        listElement = str(re.search("\d+", currChange).group(0))
-        changeNum = int(listElement)
-        currentFreq += changeNum
-        beenHereBefore.append(currentFreq)
-
-    elif(currChange.startswith("-")):
-        listElement = str(re.search("\d+", currChange).group(0))
-        changeNum = int(listElement)
-        currentFreq -= changeNum
-        beenHereBefore.append(currentFreq)
-
-    else:
-        print("Error! " +str(i))
-
-print("Freq: " +str(currentFreq))
-
-
-
-#Dag 2. Hysteriskt långsam kod som måste fixas
-totalCounter = 0
-duplicateFound = False
-while(not duplicateFound):
-    for i in range(0,len(listTest)):
-        currChange = listTest[i]
-        totalCounter += 1
-        if(currChange.startswith("+")):
-            listElement = re.search("\d+", currChange).group(0)
-            changeNum = int(listElement)
-            currentFreq += changeNum
-            if(currentFreq in beenHereBefore):
-                print("Reached " +str(currentFreq) +" in cycle " +str(i))
-                duplicateFound = True
-                break
-            beenHereBefore.append(currentFreq)
-
-        elif(currChange.startswith("-")):
-            listElement = re.search("\d+", currChange).group(0)
-            changeNum = int(listElement)
-            currentFreq -= changeNum
-            if(currentFreq in beenHereBefore):
-                print("Reached " +str(currentFreq) +" in cycle " +str(i))
-                duplicateFound = True
-                break
-            beenHereBefore.append(currentFreq)
-
-        else:
-            print("Error! " +str(i))
+seenFreqs = set()
+seenFreqs.add(currentFreq)
+while(not freqFound):
+    for i in range(0,len(mainList)):
+        currentFreq += mainList[i]
+        if(currentFreq in seenFreqs):
+            freqFound = True
+            print("First repeated freq: " +str(currentFreq))
+            break
+        seenFreqs.add(currentFreq)
