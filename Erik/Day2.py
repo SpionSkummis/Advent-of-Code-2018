@@ -2,8 +2,6 @@ readFile = open("./inputsE/input02.txt","rt")
 mainList = readFile.read().splitlines()
 readFile.close()
 
-
-
 #Day 2 part 1
 def findDuplicates(searchStr):
     hasDouble = 0
@@ -39,15 +37,13 @@ def diffCounter(firstSearchStr,secondSearchStr):
 
 doubleA = 0
 doubleB = 0
-for n in range(0,len(mainList)):
-    for m in range(0,len(mainList)):
-        if(n != m):
-            tempCounter = diffCounter(mainList[n],mainList[m])
-            if(tempCounter == 1):
-                doubleA = n
-                doubleB = m
-                break
-
+for n in range(0,len(mainList)-1):
+    for m in range((n+1),len(mainList)):
+        tempCounter = diffCounter(mainList[n],mainList[m])
+        if(tempCounter == 1):
+            doubleA = n
+            doubleB = m
+            break
 
 finalString = ""
 for i in range(0,len(mainList[doubleA])):
@@ -55,6 +51,5 @@ for i in range(0,len(mainList[doubleA])):
     if((mainList[doubleA][i]) != (mainList[doubleB][i])):
         idOfDouble = mainList[doubleA][i]
         finalString = mainList[doubleA].replace(mainList[doubleA][i], "")
-
 
 print("Common characters in strings are: " +finalString)
