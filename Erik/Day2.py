@@ -30,7 +30,6 @@ print("Found " +str(totalDoubles) +" doubles and " +str(totalTriples) +" triples
 
 
 #Day 2 part 2
-
 def diffCounter(firstSearchStr,secondSearchStr):
     diffs = 0
     for i in range(0,len(firstSearchStr)):
@@ -40,8 +39,8 @@ def diffCounter(firstSearchStr,secondSearchStr):
 
 doubleA = 0
 doubleB = 0
-for n in range(0,len(mainList)-1):
-    for m in range(0,len(mainList)-1):
+for n in range(0,len(mainList)):
+    for m in range(0,len(mainList)):
         if(n != m):
             tempCounter = diffCounter(mainList[n],mainList[m])
             if(tempCounter == 1):
