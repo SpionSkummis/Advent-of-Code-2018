@@ -4,15 +4,10 @@
 (def day2input (clojure.string/split (slurp "./day2input.txt") #"\n"))
 
 ;; Day 2-1
+
 (->> day2input
-	;; Sort strings alphabetically and split to lists of characters groups of 2 or more characters
-	(map #(apply str (sort %)))
-	(map (partial re-seq #"(.)\1+"))
-	(map (partial map first))
-	;; Create a list of vectors on the form [t d] where t and d are 1 or 0 depending on if the string contains triplets or duplicates, respectively
-	(map (partial map count))
+	(map #(vals (frequencies %)))
 	(map #(vector (if (some (partial = 3) %) 1 0) (if (some (partial = 2) %) 1 0)))
-	;; Sum all t:s and all d:s and multiply the results
 	(reduce #(vector (+ (first %1) (first %2)) (+ (second %1) (second %2))))
 	(reduce *))
 
