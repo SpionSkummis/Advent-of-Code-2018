@@ -5,12 +5,8 @@
 
 ;; Day 3-1. Slow and ugly, but what the hell.
 (defn get-rectangle-coords [left top width height]
-	(for [y (range top (+ top height)) x (range left (+ left width))] (+ (* y max-hor) x)))
-
-;; Calculate max horizontal coord
-(def max-hor (->> day3input
-	(map #(+ (nth % 1) (nth % 3)))
-	(apply max)))
+	(let [max-hor (->> day3input (map #(+ (nth % 1) (nth % 3))) (apply max))]
+	(for [y (range top (+ top height)) x (range left (+ left width))] (+ (* y max-hor) x))))
 
 (->> day3input
 	;; Drop the id
