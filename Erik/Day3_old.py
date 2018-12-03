@@ -1,4 +1,8 @@
-import re
+import re, numpy
+
+instructionsList = []
+with open("./inputsE/input03.txt", "rt") as f:
+    instructionsList = f.read().splitlines()
 
 def formatInstructions(listIn):
     finalList = []
@@ -10,22 +14,10 @@ def formatInstructions(listIn):
         finalList.append(tempList)
     return finalList
 
-def arrayCreator(lenX,lenY):
-    mainArray = []
-    for x in range(0,lenX):
-        mainArray.append([])
-        for y in range(0,lenY):
-            mainArray[x].append(0)
-    return mainArray
-
-#Dag 3 del 1
-instructionsList = []
-with open("./inputsE/input03.txt", "rt") as f:
-    instructionsList = f.read().splitlines()
 
 shortInst = formatInstructions(instructionsList)
-fabricSheet = arrayCreator(1000,1000)
 
+fabricSheet = numpy.zeros((1000,1000),dtype=int)
 for i in range(0,len(shortInst)):
     startX = shortInst[i][0]
     startY = shortInst[i][1]
@@ -41,7 +33,7 @@ for x in range(0,len(fabricSheet)):
         if(fabricSheet[x][y] > 1):
             multiCutSquares += 1
 
-print("The number of squares cut more than once is: " +str(multiCutSquares))
+print(multiCutSquares)
 
 for i in range(0,len(shortInst)):
     startX = shortInst[i][0]
@@ -53,5 +45,5 @@ for i in range(0,len(shortInst)):
         for y in range(startY,startY+repY):
             testCounter += fabricSheet[x][y]
     if(testCounter == (repX*repY)):
-        print("The non-overlapping square was found at nr " +str(i + 1)) #Listan ej nollindexerad
+        print("Found! At: " +str(i + 1)) #Listan ej nollindexerad
         break
