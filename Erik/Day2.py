@@ -6,7 +6,7 @@ readFile.close()
 def findDuplicates(searchStr):
     hasDouble = 0
     hasTriple = 0
-    uglyList = [0]*27
+    uglyList = [0]*26
     for i in range(0,len(searchStr)):
         uglyList[(ord(searchStr[i])-97)] += 1
     for j in range(0,len(uglyList)):

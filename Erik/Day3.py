@@ -46,3 +46,4 @@ for i in range(0,len(shortInst)):
             testCounter += fabricSheet[x][y]
     if(testCounter == (repX*repY)):
         print("Found! At: " +str(i + 1)) #Listan ej nollindexerad
+        break
