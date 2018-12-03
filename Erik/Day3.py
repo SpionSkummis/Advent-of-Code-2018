@@ -34,3 +34,15 @@ for x in range(0,len(fabricSheet)):
             multiCutSquares += 1
 
 print(multiCutSquares)
+
+for i in range(0,len(shortInst)):
+    startX = shortInst[i][0]
+    startY = shortInst[i][1]
+    repX = shortInst[i][2]
+    repY = shortInst[i][3]
+    testCounter = 0
+    for x in range(startX,startX+repX):
+        for y in range(startY,startY+repY):
+            testCounter += fabricSheet[x][y]
+    if(testCounter == (repX*repY)):
+        print("Found! At: " +str(i + 1)) #Listan ej nollindexerad
