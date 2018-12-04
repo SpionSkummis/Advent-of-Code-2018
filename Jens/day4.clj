@@ -2,8 +2,7 @@
 (def day4input (mapv (partial drop 1) (map first (map (partial re-seq #"\d+\-(\d+)-(\d+)\s(\d+)\:(\d+)\]\s(.+)") (clojure.string/split (slurp "./day4input.txt") #"\n")))))
 
 ;; Day 4-1
-(let
-	[formatted-input (->> (sort-by (juxt first second #(nth % 2) #(nth % 3)) day4input)
+(def formatted-input (->> (sort-by (juxt first second #(nth % 2) #(nth % 3)) day4input)
 		;; If an id is present in the event string, it means a new night has started
 		(map #(if (not= 0 (count (re-find #"\d+" (nth % 4))))
 				;; New night, output [elf-id 0].
@@ -14,8 +13,10 @@
 		(reduce #(if (some? (first %2))
 			(conj %1 %2)
 			(conj (into [] (drop-last 1 %1)) (conj (last %1) (second %2))))
-			[]))
-	sleepiest (->> formatted-input
+			[])))
+
+(let
+	[sleepiest (->> formatted-input
 		;; For each night, sum every wake-up timestamp and subtract every fall-asleep timestamp to get number of minutes slept per night
 		(map #(vector (first %) (- (reduce + (take-nth 2 (drop 1 %))) (reduce + (take-nth 2 (drop 2 %))))))
 		;; Group by elf-id and sum total minutes slept
@@ -31,7 +32,22 @@
 		flatten
 		frequencies
 		(reduce #(if (> (second %1) (second %2)) %1 %2))
-		first
-	)]
+		first)]
 	(* sleepiest most-slept-minute)
+)
+
+;; Day 4-2
+(let [answer (->> formatted-input
+		;; Get pairs [elf-id minute] for each minute slept
+		(map #(map vector (repeat (first %)) (flatten (map range (take-nth 2 (drop 2 %)) (take-nth 2 (drop 3 %))))))
+		(reduce concat)
+		;; Sort by frequency
+		frequencies
+		(sort-by second)
+		;; Grab the first one and multiply elf-id by minute
+		last
+		first
+		(reduce *)
+	)]
+	answer
 )
