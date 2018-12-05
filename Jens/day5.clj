@@ -1,19 +1,25 @@
+(require '[clojure.string :as s])
+
 ;; Read input into av list of chars :: (char ...)
 (def day5input (drop-last 1 (slurp "./day5input.txt")))
 
-;; Day 5-1
-(def character-offset (Math/abs (- (int \a) (int \A))))
+;; Checks whether chars a and b are upper and lower case versions of the same char :: char -> char -> boolean
+(defn reaction? [a b]
+	(if (some? a)
+		(and (= (s/lower-case a) (s/lower-case b)) (not= a b))
+		false))
 
-(->> day5input
-	; Convert each char to an int :: (char ...) -> (int ...)
-	(map int)
-	; Compare each int with the last. If the difference matches character offset, remove both. :: (int ...) -> [int ...]
-	(reduce #(if (= character-offset (Math/abs (- (last %1) %2)))
-		; Drop last int from vector and compare with next
-		(into [] (drop-last 1 %1))
-		; Add current int to vector and compare with next
-		(into [] (conj %1 %2)))
-		[0])
-	; Remove the leading zero and count (int ...) -> int
-	(drop 1)
-	count)
+;; Reduces string x char by char using reaction? :: (char ...) -> (char ...)
+(defn collapse-string [x]
+	(reduce (fn [a b]
+		(if (reaction? (peek a) b)
+			(pop a)
+			(conj a b)
+		)) [] x))
+
+;; Day 5-1
+(count collapse-string day5input)
+
+;; Day 5-2
+(apply min (for [i (range (int \A) (int \Z))]
+		(count (collapse-string (remove #(= (str (char i)) (s/upper-case %)) day5input)))))
