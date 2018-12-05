@@ -1,57 +1,31 @@
-
 with open("./inputsE/input05.txt", "rt") as f:
-    inputString = f.read().strip("\n")
+    inputList = list(f.read().strip("\n"))
 
-#Bra lädromar: i en for-loop beräknas "range" direkt och inte efter varje varv.
-#Strings i python går inte att ändra i på ett bra sätt.
-"""for i in range(0, (len(inputList) -45000)):
-    if((ord(inputList[i]) == (ord(inputList[i+1]) + 32)) or (ord(inputList[i]) == (ord(inputList[i+1]) - 32))):
-        inputList[i:(i+2)] = []
-        #i -= 1"""
+#testString = "dabAcCaCBAcCcaDA"
 
-#Testcase
-#inputString = "dabAcCaCBAcCcaDA"
-
-#Day1
-day1List = list(inputString)
-i = 0
-while(i < (len(day1List)-1)):
-    if((ord(day1List[i]) == (ord(day1List[i+1]) + 32)) or (ord(day1List[i]) == (ord(day1List[i+1]) - 32))):
-        day1List[i:(i+2)] = []
-        if(i>0):
+def collapsePolymer(inList):
+    collapsedList = inList
+    for i in range((len(collapsedList) -1),0, -1):
+        if((ord(collapsedList[i]) == (ord(collapsedList[i-1]) + 32)) or (ord(collapsedList[i]) == (ord(collapsedList[i-1]) - 32))):
+            del collapsedList[i-1:i+1]
             i -= 1
-    else:
-        i +=1
+    return collapsedList
 
-print(len(day1List))
+def removeChar(inList, charInt):
+    purgeList = inList # Bättre att göra nytt än att ändra i det som finns?
+    smallChar = chr(charInt+97)
+    bigChar = chr(charInt+65)
+    for i in range((len(purgeList) -1),-1, -1):
+        if((purgeList[i] == smallChar) or (purgeList[i] == bigChar)):
+            del purgeList[i]
+    return purgeList
 
-#Day 2, slow :/
-def charRemover(string, int):
-    workerList = list(string)
-    i = 0
-    while(i < len(workerList)):
-        if((workerList[i] == chr(int+97)) or (workerList[i] == chr(int+65))):
-            workerList.pop(i)
-        else:
-            i += 1
-    return workerList
+print(len(collapsePolymer(inputList)))
+
+lenAfterPurge = [0]*26
 
 
-listOfFinalLengts = [0]*26
+for i in range(0, len(lenAfterPurge)):
+    lenAfterPurge[i] = len(collapsePolymer(removeChar(inputList.copy(),i)))
 
-i = 0
-j = 0
-for m in range(0,len(listOfFinalLengts)):
-    noCharList = charRemover(inputString,m)
-    while(i < (len(noCharList)-1)):
-        if((ord(noCharList[i]) == (ord(noCharList[i+1]) + 32)) or (ord(noCharList[i]) == (ord(noCharList[i+1]) - 32))):
-            noCharList[i:(i+2)] = []
-            if(i>0):
-                i -= 1
-        else:
-            i +=1
-    listOfFinalLengts[m] = len(noCharList)
-    i = 0
-
-listOfFinalLengts.sort()
-print(listOfFinalLengts[0])
+print(min(lenAfterPurge))
