@@ -38,6 +38,10 @@ for i in range(0,len(mainList)):
     if(mainList[i][0] not in letterDict[mainList[i][1]]):
         letterDict[mainList[i][1]].append(mainList[i][0])
     
+#Till del 2:
+p2letterDict = letterDict.copy()
+p2allLetters = allLetters.copy()
+
 
 #Kollar vilka bokstäver som kan köras genom att ta de som är upplåsta (inga krav för att köra)
 #och de som blir upplåsta (alla spärrbokstäver i listan över körda bokstäver)
@@ -46,13 +50,13 @@ def findUnblocked(mainDict, orderList):
     for key in mainDict:
         if(all(elem in orderList for elem in mainDict[key])):
             resultList.append(key)
-            print(key)
     removeList = []
     for i in range(0,len(resultList)):
         if(resultList[i] in orderList):
             removeList.append(resultList[i])
     for i in range(0,len(removeList)):
         resultList.remove(removeList[i])
+    resultList.sort()
     return resultList
 
 
@@ -62,4 +66,116 @@ while(len(finalOrder) < len(allLetters)):
     finalOrder.append(canBeRun[0])
 
 print(finalOrder)
-print("".join(finalOrder))
+print("Ans 1: " +"".join(finalOrder))
+
+
+
+
+
+
+def p2findUnblocked(mainDict, orderList, startedList):
+    resultList = []
+    removeSet = set()
+    for key in mainDict:
+        if(all(elem in orderList for elem in mainDict[key])):
+            resultList.append(key)
+
+    for i in range(0,len(resultList)):
+        if(resultList[i] in orderList):
+            removeSet.add(resultList[i])
+    for i in range(0,len(resultList)):
+        if(resultList[i] in startedList):
+            removeSet.add(resultList[i])
+
+    for elem in removeSet:
+        resultList.remove(elem)
+
+    resultList.sort()
+    return resultList
+
+
+def findStepTime(oneCharString):
+    return (ord(oneCharString)-4)
+
+class SleighBuilder:
+    def __init__(self):
+        self.currentTime = 0
+        self.timeWhenDone = 0
+        self.workingLetter = ""
+
+    def getState(self,time):
+        self.currentTime = time
+        if((self.workingLetter == "")):
+            return "Waiting"
+        elif(self.timeWhenDone == self.currentTime):
+            return "Done"
+        elif(self.timeWhenDone < self.currentTime):
+            return "Working"
+        else:
+            #print("Error in getState function")
+            return "Error"
+    
+    def passDoneLetter(self):
+        self.tempLetter = self.workingLetter
+        self.workingLetter = ""
+        return self.tempLetter
+
+    def startNewLetter(self, charStr):
+        self.workingLetter = charStr
+        self.timeWhenDone = self.currentTime + ord(self.workingLetter) -4
+
+
+
+
+p2finalOrder = []
+p2startedLetters = []
+
+worker1 = SleighBuilder()
+worker2 = SleighBuilder()
+worker3 = SleighBuilder()
+worker4 = SleighBuilder()
+worker5 = SleighBuilder()
+
+a = 0
+while(len(p2finalOrder) < len(p2allLetters)):
+    if(worker1.getState(a) == "Done"):
+        p2finalOrder.append(worker1.passDoneLetter())
+    if(worker2.getState(a) == "Done"):
+        p2finalOrder.append(worker2.passDoneLetter())
+    if(worker3.getState(a) == "Done"):
+        p2finalOrder.append(worker3.passDoneLetter())
+    if(worker4.getState(a) == "Done"):
+        p2finalOrder.append(worker4.passDoneLetter())
+    if(worker5.getState(a) == "Done"):
+        p2finalOrder.append(worker5.passDoneLetter())
+
+    canBeRun = p2findUnblocked(p2letterDict,p2finalOrder,p2startedLetters)
+    if(worker1.getState(a) == "Waiting" and len(canBeRun) > 0):
+        p2startedLetters.append(canBeRun[0])
+        worker1.startNewLetter(canBeRun.pop(0))
+
+    canBeRun = p2findUnblocked(p2letterDict,p2finalOrder,p2startedLetters)
+    if(worker2.getState(a) == "Waiting" and len(canBeRun) > 0):
+        p2startedLetters.append(canBeRun[0])
+        worker2.startNewLetter(canBeRun.pop(0))
+        
+    canBeRun = p2findUnblocked(p2letterDict,p2finalOrder,p2startedLetters)
+    if(worker3.getState(a) == "Waiting" and len(canBeRun) > 0):
+        p2startedLetters.append(canBeRun[0])
+        worker3.startNewLetter(canBeRun.pop(0))
+
+    canBeRun = p2findUnblocked(p2letterDict,p2finalOrder,p2startedLetters)
+    if(worker4.getState(a) == "Waiting" and len(canBeRun) > 0):
+        p2startedLetters.append(canBeRun[0])
+        worker4.startNewLetter(canBeRun.pop(0))
+
+    canBeRun = p2findUnblocked(p2letterDict,p2finalOrder,p2startedLetters)
+    if(worker5.getState(a) == "Waiting" and len(canBeRun) > 0):
+        p2startedLetters.append(canBeRun[0])
+        worker5.startNewLetter(canBeRun.pop(0))
+
+    a += 1
+
+print(p2finalOrder)
+print("".join(p2finalOrder))
+print("Ans2: ", (a-1))
