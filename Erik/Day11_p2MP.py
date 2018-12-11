@@ -1,10 +1,10 @@
-import multiprocessing
+import multiprocessing, time
 
 def numberExtractor(num,n):
     return (num % 1000)  // 100
 
 def worker(num):
-    print("Starting worker",num)
+    print("Starting worker",num, time.strftime("%H:%M:%S"))
     gridID = 7857
     cellGrid = []
     for x in range(0,300):
@@ -33,7 +33,7 @@ def worker(num):
                     max2y = y
                     max2size = size
                 
-    print("Worker",num,"Value1:", max2sum, "X-pos:", max2x, "Y-pos:", max2y,"Gridsize:",max2size)
+    print("Worker",num,"done at",time.strftime("%H:%M:%S"),"Value1:", max2sum, "X-pos:", max2x, "Y-pos:", max2y,"Gridsize:",max2size)
     return ("Value: "+str(max2sum)+" X-pos: "+str(max2x)+" Y-pos: "+str(max2y)+" Gridsize: "+str(max2size))
 
 
