@@ -1,58 +1,7 @@
-(defn add-to-circle
-  [circle position number]
-  (concat
-   (take position circle)
-   [number]
-   (drop position circle)))
-
-(defn remove-from-circle [circle position]
-  (concat
-   (take position circle)
-   (drop (inc position) circle)))
-
-(defn play-game [number-of-players last-score]
-  (loop [i 1 active 0 circle [0] player-scores (repeat number-of-players 0)]
-    (println (str "Marble: " i "\nActive: " active "\nCircle: " (apply str (map str circle (repeat " ")))))
-    (if (= 1 i)
-      (recur (inc i) 1 [0 1] player-scores)
-      (if (= 0 (mod i 23))
-        (let [current-player (mod i number-of-players)
-              seven-prior (mod (- active 7) (count circle))
-              marble-score (+ i (nth circle seven-prior))
-              new-scores (concat
-                          (take current-player player-scores)
-                          [(+ marble-score (nth player-scores current-player))]
-                          (drop (inc current-player) player-scores))]
-          (println "Score! " marble-score)
-          (if (= marble-score last-score)
-            (apply max new-scores)
-            (recur (inc i) seven-prior (remove-from-circle circle seven-prior) new-scores)))
-        (let [marble-position (mod (+ 2 active) (count circle))]
-          (recur (inc i) marble-position (add-to-circle circle marble-position i) player-scores))))))
-
-;; Positive integers shifts circle CCW :: int -> [int ...] -> [int ...]
-(defn shift [steps circle]
-  (if (< steps 0)
-    (into [] (concat (subvec circle (+ steps (count circle))) (subvec circle 0 (+ steps (count circle)))))
-    (into [] (concat (subvec circle steps) (subvec circle 0 steps)))))
-
-(defn play-game [number-of-players last-score]
-  (loop [i 2 circle [1 0] player-scores (repeat number-of-players 0)]
-    (when (= 0 (mod i 1000)) (println i))
-    (if (< last-score i)
-      (apply max player-scores)
-      (if (= 0 (mod i 23))
-        (let [current-player (mod i number-of-players)
-              marble-score (+ i (first (shift -9 circle)))
-              new-scores (concat
-                          (take current-player player-scores)
-                          [(+ marble-score (nth player-scores current-player))]
-                          (drop (inc current-player) player-scores))]
-          (recur (inc i) (into [] (shift 2 (into [] (drop 1 (shift -9 circle))))) new-scores))
-        (recur (inc i) (into [] (shift 1 (conj circle i))) player-scores)))))
-
+;; "Create" a marble, a hash-map containing info about the marble's own number and between which marbles it is placed
 (defn get-marble [number prev next] {:number number :prev prev :next next})
 
+;; Add a marble numbered 'number' to the hash-map 'circle' after the marble numbered 'after' and update the marbles on either side
 (defn place-marble [circle number after]
   (let [next-marble ((circle after) :next)]
     (merge circle
@@ -60,6 +9,7 @@
            {after (get-marble after ((circle after) :prev) number)}
            {next-marble (get-marble next-marble number ((circle next-marble) :next))})))
 
+;; Remove the marble numbered 'number' and update the marbles on either side
 (defn remove-marble [circle number]
   (let [next-marble ((circle number) :next)
         prev-marble ((circle number) :prev)]
@@ -67,31 +17,34 @@
            {next-marble (get-marble next-marble prev-marble ((circle next-marble) :next))}
            {prev-marble (get-marble prev-marble ((circle prev-marble) :prev) next-marble)})))
   
-
+;; Return the number of the marble 'n' positions before the marble numbered 'active', in hash-map 'circle'
 (defn n-prev [circle active n]
   (loop [i n a active]
     (if (= 0 i)
       (circle a)
       (recur (dec i) ((circle a) :prev)))))
 
+;; Play a game of 'number-of-players' players and place 'last-marble' marbles. Return winning score.
 (defn play-game [number-of-players last-marble]
+  ;; Start with marble number 2 and a circle containing marbles 0 and 1, to avoid edge cases
   (loop [i 2 active 1 circle {0 {:number 0 :prev 1 :next 1} 1 {:number 1 :prev 0 :next 0}} player-scores (apply assoc {} (interleave (range 0 number-of-players) (repeat number-of-players 0)))]
-    (when (= 0 (mod i 100000)) (println i))
+    ;; If we're done, return the winning score
     (if (> i last-marble)
       (apply max (vals player-scores))
       (if (= 0 (mod i 23))
-        (let [seven-prior ((n-prev circle active 7) :number)
-              marble-score (+ i seven-prior)]
+        ;; i is divisible by 23
+        (let [seven-prior ((n-prev circle active 7) :number) ; Number of marble to remove
+              marble-score (+ i seven-prior)] ; The amount of points scored by the player
           (recur
-           (inc i)
-           ((circle seven-prior) :next)
-           (remove-marble circle seven-prior)
-           (update player-scores (mod i number-of-players) + marble-score)))
+           (inc i) ; Next marble
+           ((circle seven-prior) :next) ; The marble after the removed one is set as active
+           (remove-marble circle seven-prior) ; Remove the marble from the circle
+           (update player-scores (mod i number-of-players) + marble-score))) ; Update scores
         (recur
-         (inc i)
-         i
-         (place-marble circle i ((circle active) :next))
-         player-scores)))))
+         (inc i) ; Next marble
+         i ; Current marble set as active
+         (place-marble circle i ((circle active) :next)) ; Add current marble to circle
+         player-scores))))) ; Do nothing with the scores
 
 ;; Day 9-1
 (play-game 470 72170)
