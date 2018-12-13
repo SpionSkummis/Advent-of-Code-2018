@@ -12,6 +12,8 @@ playersList = [0]*nrOfPlayers
 marbleRing = [0]
 currentPos = 0
 for i in range(1,lastMarbleWorth+1):
+    if(i%10000 == 0):
+        print(i)
     activePlayer = i%nrOfPlayers
     if(i%23 != 0):
         newPos = currentPos +2

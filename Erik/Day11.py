@@ -1,3 +1,8 @@
+import time
+
+time1 = time.time()
+print(time1)
+
 gridID = 7857
 #gridID = 18
 
@@ -35,6 +40,17 @@ for x in range(0,len(cellGrid)-2):
 
 print("Value:", maxSum, "X-pos:", maxXpos, "Y-pos:", maxYpos)
 
+time2 = time.time()
+
+print(time2-time1)
+
+
+
+
+
+
+
+"""
 max2sum = 0
 max2x = 0
 max2y = 0
@@ -57,3 +73,4 @@ for size in range(300,1,-1):
             
 
 print("Value:", max2sum, "X-pos:", max2x, "Y-pos:", max2y,"Gridsize:",max2size)
+"""
