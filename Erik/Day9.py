@@ -7,7 +7,7 @@ with open("./inputsE/input09.txt","rt") as f:
 #lastMarbleWorth = 7999
 #print(nrOfPlayers)
 #print(lastMarbleWorth)
-lastMarbleWorth = lastMarbleWorth*100
+#lastMarbleWorth = lastMarbleWorth*100
 playersList = [0]*nrOfPlayers
 marbleRing = [0]
 currentPos = 0
