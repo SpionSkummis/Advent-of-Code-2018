@@ -7,14 +7,11 @@ with open("./inputsE/input09.txt","rt") as f:
 #lastMarbleWorth = 7999
 #print(nrOfPlayers)
 #print(lastMarbleWorth)
-#lastMarbleWorth = lastMarbleWorth*100
+
 playersList = [0]*nrOfPlayers
 marbleRing = [0]
 currentPos = 0
-for i in range(1,lastMarbleWorth+1):
-    if(i%10000 == 0):
-        print(i)
-    activePlayer = i%nrOfPlayers
+for i in range(1,lastMarbleWorth+1):  
     if(i%23 != 0):
         newPos = currentPos +2
         if(newPos > len(marbleRing)):
@@ -22,16 +19,34 @@ for i in range(1,lastMarbleWorth+1):
         marbleRing.insert(newPos,i)
         currentPos = newPos
     else:
-        #print(i)
+        activePlayer = i%nrOfPlayers
         playersList[activePlayer] += i
-        #print(playersList[activePlayer])
         currentPos = currentPos - 7
         if(currentPos < 0):
             currentPos = currentPos + len(marbleRing)
-        #print(currentPos, "currentpos")
-        #print(marbleRing[currentPos], "val marblering currentpos")
         playersList[activePlayer] += marbleRing.pop(currentPos)
-    #print(activePlayer)
     
 print(max(playersList))
-#print(playersList)
+
+
+import collections as col
+allPlayers = [0]*nrOfPlayers
+bigMarblePoints = lastMarbleWorth * 100
+#bigMarblePoints = 
+activeMarble = 0
+marbleCir = col.deque()
+marbleCir.append(0)
+
+for i in range(1,bigMarblePoints+1):
+    if(i%23 != 0):
+        marbleCir.rotate(-1)
+        marbleCir.append(i)
+    else:
+        activePlayer = i%nrOfPlayers
+        allPlayers[activePlayer] += i
+        marbleCir.rotate(7)
+        allPlayers[activePlayer] += marbleCir.pop()
+        marbleCir.rotate(-1)
+
+print(max(allPlayers))
+
