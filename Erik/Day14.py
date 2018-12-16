@@ -58,7 +58,7 @@ while(not patternFound):
     
 subtractNum = 6
 if(lastAddIsDual):
-    subtractNum =+ 1
+    subtractNum += 1
 print(len(cookList)-subtractNum)
 
 #38052 - too low 20182291 - too high
