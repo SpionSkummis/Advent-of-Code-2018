@@ -2,7 +2,6 @@
 (def day8input (vec (map read-string (clojure.string/split (slurp "./day8input.txt") #"\s+"))))
 
 ;; Day 8-1
-
 ;; Take input and return a vector describing the first node found without children [start end data] :: [int ...] -> [int int int]
 (defn first-bottom-node [input]
   (loop [branches (take-nth 2 input) index 0]
@@ -26,36 +25,38 @@
       (recur new-tree (+ total (peek node))))))
 
 ;; Day 8-2
+;; Return number of vectors in the branch :: [int/[int] ...] -> int
+(defn count-sub-branches [branch]
+  (reduce #(if (vector? %2) (inc %1) %1) 0 (subvec branch 2)))
 
-;; Take a node description and input and replace the described node with a vector containing its value :: [int int int] -> [int ...] -> [int ... [int] int ...]
-(defn collapse-node [node-desc input]
-  (vec (concat (conj (subvec input 0 (first node-desc)) [(last node-desc)]) (subvec input (second node-desc)))))
+;; Sum the node in input found between start (inclusive) and end (exclusive) :: [int/[int] ...] -> [int int] -> int
+(defn sum-node [input [start end]]
+  (let [node (subvec input start end)]
+    (if (= 0 (first node))
+      ;; No sub-branches, sum metadata
+      (reduce + (subvec node 2))
+      ;; Branches, read metadata and sum branch values
+      (let [branch-data (flatten (subvec node 2 (+ 2 (first node)))) ; Vector of branch values
+            meta-data (subvec node (+ 2 (first node)))] ; Metadata
+        ;; For each metadata, pick corresponding branch value. Sum them all.
+        (reduce + (map #(nth branch-data (dec %) 0) meta-data))))))
 
-;; Sum the value of a node, if sub-branches and meta-data is known :: [int ...] -> [int ...] -> int
-(defn sum-node [sub-branches meta-data]
-  #dbg (if (empty? sub-branches)
-    (reduce + meta-data)
-    (reduce + (flatten (map #(nth sub-branches (dec %) 0) meta-data)))))
+;; Collapse the node in input found between start (inclusive) and end (exclusive), replacing it with a vector containing its value. :: [int/[int] ...] -> [int int] -> [int/[int] ...]
+(defn collapse-node [input [start end]]
+  (into (conj (subvec input 0 start) [(sum-node input [start end])]) (subvec input end)))
 
-;; Find the first node that can be fully solved and return a description of it :: [int ...] -> [int int int]
+;; Find the first node that can be fully solved and returns its start and end index :: [int ...] -> [int int]
 (defn first-solvable-node [input]
-  (loop [branches input distance 0 index 0]
-    (if (= 0 (first branches) (mod distance 2))
-    #dbg  (let [found index
-            sub-branches (loop [i 0 result []]
-                           (if (vector? (nth input (+ found 2 i)))
-                             (recur (inc i) (conj result (nth input (+ found 2 i))))
-                             result))
-            meta-data (subvec input (+ 2 found (count sub-branches)) (+ 2 found (count sub-branches) (nth input (inc found))))
-            end (+ 2 found (count sub-branches) (count meta-data))]
-        (vector found end (sum-node sub-branches meta-data)))
-      (recur (drop 1 branches) (if (vector? (first branches)) 0 (inc distance)) (inc index)))))
+  (loop [tree input index 0]
+    ;; Neither the first nor the second number can be a vector (i.e. calculated sub-branch)
+    (if (and (not (vector? (first tree))) (not (vector? (second tree))))
+      (if (or (= 0 (first tree)) ; 0 means we've found a top node
+              (= (count-sub-branches (subvec tree 0 (+ 2 (first tree)))) (first tree))) ; All sub-branches are calculated
+        [index (+ 2 index (first tree) (second tree))] ; [start end]
+        (recur (subvec tree 1) (inc index)))
+      (recur (subvec tree 1) (inc index)))))
 
-(loop [input day8input top-branches (first day8input)]
-  ;; To avoid edge cases, jump to output as soon as there is only one node remaining in input
-  (if (> (+ 3 top-branches (second input)) (count input))
-    (+ (sum-node (subvec 2 (+ 2 top-branches)) (subvec (+ 2 top-branches))))
-    (let [node (first-solvable-node input)
-          new-tree (assoc (collapse-node node input)
-                          (- (first node) 2) (dec (nth input (- (first node) 2))))]
-      (recur new-tree top-branches))))
+(loop [input day8input]
+  (if (= (count input) (+ 2 (first input) (second input)))
+    (sum-node input [0 (count input)])
+    (recur (collapse-node input (first-solvable-node input)))))
