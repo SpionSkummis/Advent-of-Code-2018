@@ -126,31 +126,31 @@ print("After",tick,"rounds, the first colision was at", colXY)
 
 
 
-
 mainMap2 = replaceCarts(inputList)
 wagonList2 = []
+
 for x in range(0,len(inputList)):
     for y in range(0,len(inputList[0])):
         if((inputList[x][y] == ">") or (inputList[x][y] == "<") or (inputList[x][y] == "v") or (inputList[x][y] == "^")):
             wagonList2.append(Cart(x,y,inputList[x][y]))
 
-
 tick = 0
 while(len(wagonList2) > 1):
     tick += 1
+    wagonList2.sort(key=lambda x: (x.getpos()))
     collidedCarts = []
 
     for i in range(0,len(wagonList2)):
         wagonList2[i].move(mainMap2)
 
-    for i in range(0,len(wagonList2)):
-        for j in range(0,len(wagonList2)):
-            if((wagonList2[i].getpos() == wagonList2[j].getpos()) and (i != j)):
-                print("collision detected at", wagonList2[i].getpos(), wagonList2[j].getpos(), "tick", tick, i, j)
-                if(i not in collidedCarts):
-                    collidedCarts.append(i)
-                if(j not in collidedCarts):
-                    collidedCarts.append(j)
+        for n in range(0,len(wagonList2)):
+            for j in range(0,len(wagonList2)):
+                if((wagonList2[n].getpos() == wagonList2[j].getpos()) and (n != j)):
+                    print("collision detected at", wagonList2[n].getpos(), wagonList2[j].getpos(), "tick", tick, n, j)
+                    if(n not in collidedCarts):
+                        collidedCarts.append(n)
+                    if(j not in collidedCarts):
+                        collidedCarts.append(j)
         
     collidedCarts.sort()
     for i in range(len(collidedCarts)-1,-1,-1):
@@ -158,27 +158,8 @@ while(len(wagonList2) > 1):
         wagonList2.pop(collidedCarts[i])
 
 
-
-    
-    
-    """
-    if(len(collidedCarts) > 0):
-        print(collidedCarts.sort())
-
-        
-    collidedCarts.sort()
-    for i in range(len(collidedCarts)-1, 0, -1):
-        
-        print("BOOM!",wagonList2[collidedCarts[i]].getpos(), "tick", tick)
-        wagonList2.pop(collidedCarts[i])
-    """
-#wagonList2[0].move(mainMap2)
 print(wagonList2[0].getpos())
 print(tick)
-
-#print(colXY)
-
-
 
 
 #Test (73,134) - fel (87,11) - fel (86,11) - fel
