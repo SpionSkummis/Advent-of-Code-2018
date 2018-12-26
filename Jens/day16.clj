@@ -8,6 +8,10 @@
    (mapv #(mapv read-string %) (map (partial drop 1) (re-seq #"\]\n(\d+) (\d) (\d) (\d)" day16input)))
    (mapv #(mapv read-string %) (map (partial drop 1) (re-seq #"After\: +\[(\d)\, (\d)\, (\d)\, (\d)" day16input)))))
 
+;; Parsing the second part of the input
+(def input2
+  (apply list (map #(map read-string %) (map (partial drop 1) (re-seq #"\n(\d+) (\d) (\d) (\d)(?!\nA)" day16input)))))
+
 ;; Record for test cases
 (defrecord test-case [before instruction after])
 
@@ -15,10 +19,10 @@
 (def test-cases (map ->test-case (first input1) (second input1) (nth input1 2)))
 
 ;;; HELPER FUNCTIONS
-;; Makes = return 1 or 0 instead of boolean :: int -> int -> int
+;; Equality that returns 1 or 0 instead of boolean :: int -> int -> int
 (defn eq [a b] (if (= a b) 1 0))
 
-;; Makes > return 1 or 0 instead of boolean :: int -> int -> int
+;; Greater than that returns 1 or 0 instead of boolean :: int -> int -> int
 (defn gt [a b] (if (> a b) 1 0))
 
 ;; Takes two values and returns the first :: a -> b -> a
@@ -70,6 +74,7 @@
 (def all-functions [addr addi mulr muli banr bani borr bori setr seti gtir gtri gtrr eqir eqri eqrr])
 
 ;; Tests function f with test-case t and returns true if output and :after matches
+;; possible-opcode? :: fn -> test-case -> bool
 (defn possible-opcode? [f t] (= (:after t) (f (:before t) (:instruction t))))
 
 ;; Takes a test case, returns opcode and matching functions :: test-case -> ([int fn] ...)
@@ -79,5 +84,48 @@
                   (vector (first (:instruction %2)) %1)
                   nil)
                all-functions (repeat x))))
-;;; Day 16-1
+;;; DAY 16-1
 (count (filter #(>= % 3) (map #(count (matching-functions %)) test-cases)))
+
+;;; DAY 16-2
+
+;; If all opcode-function pairs in the supplied vector are equal, returns that pair. Otherwise, returns nil.
+;; unambiguous? :: [[int fn] ...] -> bool
+(defn unambiguous? [code-fn-pairs] (reduce #(if (= %1 %2) %1 nil) code-fn-pairs))
+
+;; Matches each opcode to a function in a hash-map, assuming no ambiguous opcodes exist :: {int fn, ...}
+(def opcodes
+  (loop [remaining (mapcat matching-functions test-cases) solved {}]
+  (if (empty? remaining)
+    solved
+    (let [currently-solved (reduce #(when (some? %2) (reduced %2)) ; Returns the first encountered opcode-function pair
+                                   nil ; Starting value for reduce (could be anything)
+                                   (map (comp unambiguous? val) (group-by first remaining)))] ; Get unambiguous opcode-pair combinations
+      (recur (remove #(= (second %) (second currently-solved)) remaining) ; Remove any pairs containing the solved function
+             (assoc solved (first currently-solved) (second currently-solved))))))) ; Add an opcode-function pair to the map
+
+(loop [remaining input2 registers [0 0 0 0]]
+  (if (empty? remaining) ; We're done when no instructions remain
+    registers ; Return the values of the registers
+    (let [instruction (peek remaining)] ; The instruction to execute
+      (recur (pop remaining) ; Remaining instructions
+             ((opcodes (first instruction)) registers (vec instruction)))))) ; Apply first instruction to registers
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
