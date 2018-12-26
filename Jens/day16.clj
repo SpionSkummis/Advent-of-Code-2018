@@ -110,22 +110,3 @@
     (let [instruction (peek remaining)] ; The instruction to execute
       (recur (pop remaining) ; Remaining instructions
              ((opcodes (first instruction)) registers (vec instruction)))))) ; Apply first instruction to registers
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
