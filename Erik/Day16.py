@@ -13,15 +13,7 @@ with open("./inputsE/input16.txt","rt") as f:
         k = f.readline()
 testList = [[3,2,1,1],[9,2,1,2],[3,2,2,1]]
 
-
-
-
-
-
-print(testList)
-
-
-
+#Alla funktioner på en liten liten rad
 # addr (add register) stores into register C the result of adding register A and register B.
 def addr(regIn, instr):
     reg = regIn.copy()
@@ -127,15 +119,25 @@ def solveAll(startRegister, instructionSet):
     answList = [addr(r,i),addi(r,i),mulr(r,i),muli(r,i),banr(r,i),bani(r,i),borr(r,i),bori(r,i),setr(r,i),seti(r,i),gtir(r,i),gtri(r,i),gtrr(r,i),eqir(r,i),eqri(r,i),eqrr(r,i)]
     return answList
 
-def actsLike(register, instructions):
-    allCommands = ["addr","addi","mulr","muli","banr","bani","borr","bori","..."]
-    pass
+def actsLike(inList):
+    allCommands = ["addr","addi","mulr","muli","banr","bani","borr","bori","setr","seti","gtir","gtri","gtrr","eqir","eqri","eqrr"]
+    solutions = solveAll(inList[0],inList[1])
+    retThis = []
+    for i in range(0,len(solutions)):
+        #print(solutions[i], inList[2])
+        if(solutions[i] == inList[2]):
+            retThis.append(allCommands[i])
+    return retThis
+
+print
+        
+
+        
 
 
 
-
-
-mainCount = 0
+#Loopen som löser del 1 (651)
+part1answ = 0
 for i in range(0,len(mainList)):
     counter = 0
     solvedList = solveAll(mainList[i][0],mainList[i][1])
@@ -143,6 +145,67 @@ for i in range(0,len(mainList)):
         if(solvedList[j] == mainList[i][2]):
             counter += 1
     if(counter >= 3):
-        mainCount += 1
+        part1answ += 1
+print(part1answ)
 
-print(mainCount)
+
+
+
+#print(actsLike(testList))
+allOpCodes = [["addr","addi","mulr","muli","banr","bani","borr","bori","setr","seti","gtir","gtri","gtrr","eqir","eqri","eqrr"]]*16
+#print(allOpCodes)
+for i in range(0,len(mainList)):
+    thisOpCode = mainList[i][1][0]
+    #print(thisOpCode)
+    possibleCodes = actsLike(mainList[i])
+    #print(possibleCodes)
+    newList = []
+    for j in range(0,len(possibleCodes)):
+        if(possibleCodes[j] in allOpCodes[thisOpCode]):
+            newList.append(possibleCodes[j])
+    allOpCodes[thisOpCode] = newList.copy()
+
+opDict = dict()
+"""
+for i in range(0,len(allOpCodes)):
+    opDict[i] = allOpCodes[i]
+"""
+
+doneDict = dict()
+done = False
+while(not done):
+    for i in range(0,len(allOpCodes)):
+        removeKey = ""
+        if(len(allOpCodes[i]) == 1):
+            opDict[i] = allOpCodes[i][0]
+            removeKey = allOpCodes[i][0]
+            for j in range(0,len(allOpCodes)):
+                if(removeKey in allOpCodes[j]):
+                    allOpCodes[j].remove(removeKey)
+    c = 0
+    for i in range(0,len(allOpCodes)):
+        if(len(allOpCodes[i]) == 0):
+            c += 1
+    if(c >= 8):
+        done = True
+    print(allOpCodes)
+
+print(allOpCodes)
+print(opDict)
+"""
+#completedInstr:
+for i in range(0,len(allOpCodes)):
+    if(len(allOpCodes[i]) == 0):
+        completedInstr.append(allOpCodes[i][0])
+        newList = []
+        for j in range(0,len(allOpCodes)):
+            pass
+            
+"""
+
+
+for i in range(0,len(allOpCodes)):
+    print(i, allOpCodes[i])
+
+
+
